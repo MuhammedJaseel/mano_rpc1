@@ -5,7 +5,7 @@ import { createWallet, findWallet, updateWallet } from "../modules/store.js";
 export const getBalance = async (params) => {
   const a = params?.[0];
   // const wallet = await walletModel.findOne({ a });
-  const wallet = findWallet(a);
+  const wallet = await findWallet(a);
   return wallet?.b || "0x0";
 };
 

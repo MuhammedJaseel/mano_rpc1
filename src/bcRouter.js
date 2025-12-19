@@ -10,7 +10,7 @@ const routes = {
   eth_chainId: async (params) => {
     return { result: await chainId(params) };
   },
-  eth_getBalance: async (params) => {
+  eth_getBalance: async (params) => {    
     return { result: await getBalance(params) };
   },
   eth_blockNumber: async (params) => {
@@ -52,7 +52,6 @@ export default async function bcRouter(body) {
   } else {
     const result = await routes[body.method](body.params);
     if (!result) console.log(it.method);
-    console.log({ id: body.id, jsonrpc: "2.0", ...result });
     return { id: body.id, jsonrpc: "2.0", ...result };
   }
 }

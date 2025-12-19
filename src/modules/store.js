@@ -48,7 +48,7 @@ export async function createBlock() {
 
   const dataBytes = ethers.toUtf8Bytes(JSON.stringify(data));
   const hash = ethers.keccak256(dataBytes);
-  console.log(hash);
+  // console.log(hash);
 
   // return Block.create({});
 }

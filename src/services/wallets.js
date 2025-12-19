@@ -41,15 +41,15 @@ export const sendRawTransaction = async (params) => {
 
   fromBalance -= txValue + txGas;
   from.b = "0x" + fromBalance.toString(16);
-  updateWallet(from.a, { b: from.b });
+  await updateWallet(from.a, { b: from.b });
 
   let to = await findWallet(signedTx.to);
 
   if (!to) {
-    createWallet({ a: signedTx.to, b: "0x" + txValue.toString(16) });
+    await createWallet({ a: signedTx.to, b: "0x" + txValue.toString(16) });
   } else {
     const toBalance = BigInt(to.b) + txValue;
-    updateWallet(signedTx.to, { b: "0x" + toBalance.toString(16) });
+    await updateWallet(signedTx.to, { b: "0x" + toBalance.toString(16) });
   }
 
   //   console.log("Raw Tx:", rawTx);

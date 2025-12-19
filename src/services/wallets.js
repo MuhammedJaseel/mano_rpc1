@@ -41,7 +41,7 @@ export const sendRawTransaction = async (params) => {
 
   fromBalance -= txValue + txGas;
   from.b = "0x" + fromBalance.toString(16);
-  updateWallet(from, { b: from.b });
+  updateWallet(from.a, { b: from.b });
 
   let to = await findWallet(signedTx.to);
 

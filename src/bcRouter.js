@@ -1,4 +1,4 @@
-import { ESTIMATE_GAS, GAS_PRICE } from "./modules/static.js";
+import { CHAIN_ID, ESTIMATE_GAS, GAS_PRICE } from "./modules/static.js";
 import { blockNumber, getBlockByNumber } from "./services/chain.js";
 import {
   getBalance,

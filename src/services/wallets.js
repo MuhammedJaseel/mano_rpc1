@@ -37,13 +37,7 @@ export const sendRawTransaction = async (params) => {
 
   const from = await _findWallet(signedTx.from);
 
-  if (!from) {
-    return {
-      error: { code: -32603, message: "insufficient funds for execution" },
-    };
-  }
-
-  var fromBalance = new Decimal(from.b);
+  var fromBalance = new Decimal(from?.b || "0x0");
 
   if (fromBalance.toNumber() < txValue.plus(txGas).toNumber()) {
     return {
@@ -64,7 +58,7 @@ export const sendRawTransaction = async (params) => {
       { session }
     );
 
-    if (updateResult.matchedCount === 0) throw new Error();
+    if (!updateResult) throw {};
 
     await Txn.create(
       [

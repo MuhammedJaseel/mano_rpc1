@@ -36,7 +36,12 @@ async function getCBlock() {
 var IS_MINING = false;
 
 export async function mine() {
-  if (IS_MINING) return setTimeout(mine, 5000);
+  if (IS_MINING) {
+    setTimeout(() => {
+      mine();
+    }, 5000);
+    return;
+  }
   IS_MINING = true;
 
   const session = await mongoose.startSession();
@@ -76,7 +81,7 @@ export async function mine() {
         { session }
       );
 
-      if (updateResult.matchedCount === 1) {
+      if (updateResult) {
         await Wallets.findOneAndUpdate(
           { a: tx.f },
           { $inc: { cn: 1 } },

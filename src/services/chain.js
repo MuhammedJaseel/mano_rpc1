@@ -37,9 +37,9 @@ var IS_MINING = false;
 
 export async function mine() {
   if (IS_MINING) {
-    setTimeout(() => {
-      mine();
-    }, 5000);
+    // setTimeout(() => {
+    //   mine();
+    // }, 5000);
     return;
   }
   IS_MINING = true;

@@ -84,7 +84,8 @@ export const sendRawTransaction = async (params) => {
     try {
       // fetch(process.env.SCAN_API + "/rpcinfo?info=txn_added");
     } catch (e) {}
-    mine();
+    // mine();
+    await mine();
     return { result: signedTx.hash };
   } catch (err) {
     await session.abortTransaction();

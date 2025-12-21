@@ -51,7 +51,7 @@ export const sendRawTransaction = async (params) => {
 
   var fromBalance = new Decimal(from.b);
 
-  if (fromBalance < txValue.plus(txGas)) {
+  if (fromBalance.toNumber() < txValue.plus(txGas).toNumber()) {
     return {
       error: { code: -32603, message: "insufficient funds for execution" },
     };

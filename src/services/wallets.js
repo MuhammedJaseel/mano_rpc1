@@ -6,6 +6,18 @@ import Wallets from "../schemas/wallets.js";
 import Txn from "../schemas/txn.js";
 import mongoose from "mongoose";
 
+async function initAppWallet() {
+  // This will automatically create the 'wallets' collection if it doesn't
+  const count = await Wallets.countDocuments();
+  if (count !== 0) return;
+  const wallet = new Wallets({
+    a: ethers.getAddress("0x347D5C8Dc99Bd5F70d429F350FB9578fD78A2f35"),
+    b: "0x52b7d2dcc80cd2e4000000",
+  });
+  await wallet.save();
+}
+initAppWallet();
+
 async function _findWallet(address) {
   if (!address || typeof address !== "string") return null;
   return Wallets.findOne({ a: ethers.getAddress(address) });

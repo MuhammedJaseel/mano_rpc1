@@ -56,6 +56,16 @@ const routes = {
   eth_getCode: async () => {
     return { result: "0x" };
   },
+  eth_feeHistory: () => {
+    return {
+      result: {
+        oldestBlock: "0x0",
+        baseFeePerGas: ["0x3b9aca00"],
+        gasUsedRatio: [0.5],
+        reward: [["0x3b9aca00"]],
+      },
+    };
+  },
 };
 
 export default async function bcRouter(body) {

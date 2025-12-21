@@ -34,10 +34,9 @@ export const getTransactionCount = async (params) => {
   const type = params?.[1];
   if (!address || typeof address !== "string") return null;
   const wallet = await Wallets.findOne({ a: ethers.getAddress(address) });
-  if (!wallet) return null;
-  if (type === "pending") return "0x" + (wallet.n + 1).toString(16);
+  if (!wallet) return "0x0";
   if (type === "latest") return "0x" + wallet.cn.toString(16);
-  return null;
+  return "0x" + (wallet.n + 1).toString(16);
 };
 
 export const sendRawTransaction = async (params) => {

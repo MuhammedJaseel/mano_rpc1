@@ -44,20 +44,20 @@ export const sendRawTransaction = async (params) => {
   const sign = params[0];
   const signedTx = Transaction.from(sign);
 
-  const txValue = new Decimal(signedTx.value);
-  const txGas = new Decimal(GAS_PRICE) * new Decimal(GAS_LIMIT);
+  const txValue = BigInt(signedTx.value);
+  const txGas = BigInt(GAS_PRICE) * BigInt(GAS_LIMIT);
 
   const from = await _findWallet(signedTx.from);
 
-  var fromBalance = new Decimal(from?.b || "0x0");
+  var fromBalance = BigInt(from?.b || "0x0");
 
-  if (fromBalance.toNumber() < txValue.plus(txGas).toNumber()) {
+  if (fromBalance < txValue + txGas) {
     return {
       error: { code: -32603, message: "insufficient funds for execution" },
     };
   }
 
-  fromBalance -= txValue.plus(txGas);
+  fromBalance -= txValue + txGas;
   const b = "0x" + fromBalance.toString(16);
 
   const session = await mongoose.startSession();
@@ -79,11 +79,11 @@ export const sendRawTransaction = async (params) => {
           s: sign,
           f: signedTx.from,
           t: signedTx.to,
-          v: "0x" + new Decimal(signedTx.value).toNumber().toString(16),
+          v: "0x" + signedTx.value.toString(16),
           n: signedTx.nonce,
           gp: GAS_PRICE,
           gl: GAS_LIMIT,
-          gu: "0x" + new Decimal(txGas).toNumber().toString(16),
+          gu: "0x" + txGas.toString(16),
           bn: null,
           bh: null,
         },

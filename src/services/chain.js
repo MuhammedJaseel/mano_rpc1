@@ -37,9 +37,7 @@ var IS_MINING = false;
 
 export async function mine() {
   if (IS_MINING) {
-    setTimeout(() => {
-      mine();
-    }, 5000);
+    setTimeout(() => mine(), 5000);
     return;
   }
   IS_MINING = true;
@@ -53,7 +51,7 @@ export async function mine() {
     const txns = await Txn.find({ st: "P" });
 
     const txnHashes = [];
-    var totalGasUsed = new Decimal(0);
+    var totalGasUsed = BigInt(0);
 
     const hashRow = JSON.stringify({
       number: cBlock.number,
@@ -70,9 +68,9 @@ export async function mine() {
         let body = { a: ethers.getAddress(tx.t), b: tx.v };
         await Wallets.create([body], { session });
       } else {
-        let toBalance = new Decimal(to.b).plus(new Decimal(tx.v));
+        let toBalance = BigInt(to.b) + BigInt(tx.v);
         let a = ethers.getAddress(tx.t);
-        let b = "0x" + toBalance.toNumber().toString(16);
+        let b = "0x" + toBalance.toString(16);
         await Wallets.findOneAndUpdate({ a }, { b }, { session });
       }
 
@@ -89,7 +87,7 @@ export async function mine() {
           { session }
         );
         txnHashes.push(tx.th);
-        totalGasUsed = totalGasUsed.plus(new Decimal(tx.gu));
+        totalGasUsed = totalGasUsed + BigInt(tx.gu);
       }
     }
 
@@ -101,7 +99,7 @@ export async function mine() {
     };
 
     const MINER = ethers.getAddress(MINER_1);
-    const totalGasUsedHex = "0x" + totalGasUsed.toNumber().toString(16);
+    const totalGasUsedHex = "0x" + totalGasUsed.toString(16);
 
     await Block.create(
       [
@@ -125,9 +123,9 @@ export async function mine() {
       let body = { a: ethers.getAddress(MINER), b: totalGasUsedHex };
       await Wallets.create([body], { session });
     } else {
-      let minerNewBalance = new Decimal(miner.b).plus(totalGasUsed);
+      let minerNewBalance = BigInt(miner.b) + totalGasUsed;
       let a = ethers.getAddress(MINER);
-      let b = "0x" + minerNewBalance.toNumber().toString(16);
+      let b = "0x" + minerNewBalance.toString(16);
       await Wallets.findOneAndUpdate({ a }, { b }, { session });
     }
     await session.commitTransaction();

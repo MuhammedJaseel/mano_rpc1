@@ -74,13 +74,13 @@ export default async function bcRouter(body) {
   if (Array.isArray(body)) {
     const results = [];
     for (let it of body) {
-      console.log(it.method);
+      // console.log(it.method);
       const result = await routes[it.method]?.(it.params);
       results.push({ id: it.id, jsonrpc: "2.0", ...result });
     }
     return results;
   } else {
-    console.log(body.method);
+    // console.log(body.method);
     const result = await routes[body.method]?.(body.params);
     return { id: body.id, jsonrpc: "2.0", ...result };
   }

@@ -47,7 +47,7 @@ export async function mine() {
   try {
     const cBlock = await getCBlock();
 
-    const txns = await Txn.find({ st: "P" }, { session });
+    const txns = await Txn.find({ st: "P" }, null, { session });
 
     const txnHashes = [];
     var totalGasUsed = BigInt(0);

@@ -47,7 +47,7 @@ export async function mine() {
   try {
     const cBlock = await getCBlock();
 
-    const txns = await Txn.find({ st: "P" }, null, { session });
+    const txns = await Txn.find({ st: "P" }).session(session);
 
     const txnHashes = [];
     var totalGasUsed = BigInt(0);
@@ -67,35 +67,33 @@ export async function mine() {
       console.log("Step 2");
       let toAddress = ethers.getAddress(tx.t);
       console.log("Step 3");
-      let to = await Wallets.findOne({ a: toAddress }, { session });
+      let to = await Wallets.findOne({ a: toAddress }).session(session);
       console.log("Step 4");
       if (!to) {
         let body = { a: toAddress, b: tx.v };
         console.log("Step 5");
-        await Wallets.create([body], { session });
+        await Wallets.create([body]).session(session);
       } else {
         let toBalance = BigInt(to.b) + BigInt(tx.v);
         console.log("Step 6");
         let a = toAddress;
         let b = "0x" + toBalance.toString(16);
         console.log("Step 7");
-        await Wallets.findOneAndUpdate({ a }, { b }, { session });
+        await Wallets.findOneAndUpdate({ a }, { b }).session(session);
       }
 
       console.log("Step 8");
       let updateResult = await Txn.findOneAndUpdate(
         { th: tx.th, st: "P" },
-        { st: "C", bn: cBlock.number, bh: blockHash },
-        { session }
-      );
+        { st: "C", bn: cBlock.number, bh: blockHash }
+      ).session(session);
 
       console.log("Step 9");
       if (updateResult) {
         await Wallets.findOneAndUpdate(
           { a: tx.f },
-          { $inc: { cn: 1 } },
-          { session }
-        );
+          { $inc: { cn: 1 } }
+        ).session(session);
         txnHashes.push(tx.th);
         totalGasUsed = totalGasUsed + BigInt(tx.gu);
       }
@@ -115,36 +113,33 @@ export async function mine() {
     const totalGasUsedHex = "0x" + totalGasUsed.toString(16);
     console.log("Step 13");
 
-    await Block.create(
-      [
-        {
-          bn: cBlock.number,
-          bh: blockHash,
-          ph: cBlock.prevHash,
-          n: "0x0000000000000000",
-          ts: cBlock.timestamp,
-          txs: txnHashes,
-          m: MINER,
-          gu: totalGasUsedHex,
-        },
-      ],
-      { session }
-    );
+    await Block.create([
+      {
+        bn: cBlock.number,
+        bh: blockHash,
+        ph: cBlock.prevHash,
+        n: "0x0000000000000000",
+        ts: cBlock.timestamp,
+        txs: txnHashes,
+        m: MINER,
+        gu: totalGasUsedHex,
+      },
+    ]).session(session);
     console.log("Step 14");
 
-    let miner = await Wallets.findOne({ a: MINER }, { session });
+    let miner = await Wallets.findOne({ a: MINER }).session(session);
     console.log("Step 15");
 
     if (!miner) {
       console.log("Step 16");
       let body = { a: MINER, b: totalGasUsedHex };
-      await Wallets.create([body], { session });
+      await Wallets.create([body]).session(session);
     } else {
       console.log("Step 17");
       let minerNewBalance = BigInt(miner.b) + totalGasUsed;
       let a = MINER;
       let b = "0x" + minerNewBalance.toString(16);
-      await Wallets.findOneAndUpdate({ a }, { b }, { session });
+      await Wallets.findOneAndUpdate({ a }, { b }).session(session);
       console.log("Step 18");
     }
     await session.commitTransaction();

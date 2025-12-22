@@ -18,14 +18,10 @@ async function initAppWallet() {
 }
 initAppWallet();
 
-async function _findWallet(address) {
-  if (!address || typeof address !== "string") return null;
-  return Wallets.findOne({ a: ethers.getAddress(address) });
-}
-
 export const getBalance = async (params) => {
   const a = params?.[0];
-  const wallet = await _findWallet(a);
+  if (!a || typeof a !== "string") return null;
+  const wallet = await Wallets.findOne({ a: ethers.getAddress(a) });
   return wallet?.b || "0x0";
 };
 
@@ -46,7 +42,7 @@ export const sendRawTransaction = async (params) => {
   const txValue = BigInt(signedTx.value);
   const txGas = BigInt(GAS_PRICE) * BigInt(GAS_LIMIT);
 
-  const from = await _findWallet(signedTx.from);
+  const from = await Wallets.findOne({ a: ethers.getAddress(signedTx.from) });
 
   var fromBalance = BigInt(from?.b || "0x0");
 

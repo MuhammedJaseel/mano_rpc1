@@ -62,13 +62,14 @@ export async function mine() {
       "0x" + crypto.createHash("sha256").update(hashRow).digest("hex");
 
     for (let tx of txns) {
-      let to = await Wallets.findOne({ a: tx.t });
+      let toAddress = ethers.getAddress(tx.t);
+      let to = await Wallets.findOne({ a: toAddress });
       if (!to) {
-        let body = { a: ethers.getAddress(tx.t), b: tx.v };
+        let body = { a: toAddress, b: tx.v };
         await Wallets.create([body], { session });
       } else {
         let toBalance = BigInt(to.b) + BigInt(tx.v);
-        let a = ethers.getAddress(tx.t);
+        let a = toAddress;
         let b = "0x" + toBalance.toString(16);
         await Wallets.findOneAndUpdate({ a }, { b }, { session });
       }

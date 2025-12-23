@@ -36,7 +36,7 @@ var IS_MINING = false;
 
 export async function mineTransactins() {
   if (IS_MINING) {
-    setTimeout(() => mineTransactins(), 5000);
+    // setTimeout(() => mineTransactins(), 5000);
     return { loading: true, succes: false };
   }
   IS_MINING = true;

@@ -36,10 +36,12 @@ var IS_MINING = false;
 
 export async function mineTransactins() {
   if (IS_MINING) {
-    // setTimeout(() => mineTransactins(), 5000);
+    setTimeout(() => mineTransactins(), 5000);
     return { loading: true, succes: false };
   }
   IS_MINING = true;
+
+  let responseTransactiCount = 0;
 
   const session = await mongoose.startSession();
   session.startTransaction();
@@ -137,6 +139,8 @@ export async function mineTransactins() {
       prevHash: blockHash,
     };
 
+    responseTransactiCount = txnHashes.length;
+
     await session.commitTransaction();
     session.endSession();
 
@@ -150,7 +154,7 @@ export async function mineTransactins() {
   }
 
   IS_MINING = false;
-  return { succes: true };
+  return { succes: true, txsCount: responseTransactiCount };
 }
 
 export const blockNumber = async () => {

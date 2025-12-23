@@ -15,16 +15,16 @@ app.use(cors());
 await connectDB();
 
 app.get("", async (req, res) => {
-  return res.json({ status: "Working", version: "1.0.3" });
+  return res.json({ status: "Working", version: "1.0.4" });
 });
 
 app.post("", async (req, res) => {
   return res.json(await bcRouter(req.body));
 });
 
-app.get("/mine", (req, res) => {
+app.get("/mine", async (req, res) => {
   console.log("Mining mannualy");
-  return mineTransactins();
+  return res.json(await mineTransactins());
 });
 
 const PORT = process.env.PORT || 4501;

@@ -15,7 +15,7 @@ app.use(cors());
 await connectDB();
 
 app.get("", async (req, res) => {
-  return res.json({ status: "Working", version: "1.0.2" });
+  return res.json({ status: "Working", version: "1.0.3" });
 });
 
 app.post("", async (req, res) => {

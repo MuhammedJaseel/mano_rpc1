@@ -1,4 +1,4 @@
-import { GAS_LIMIT } from "../modules/static.js";
+import { GAS_LIMIT, MINER_1 } from "../modules/static.js";
 import Block from "../schemas/block.js";
 import mine from "./mine.js";
 
@@ -17,7 +17,7 @@ export async function mineTransactins() {
     return { loading: true, succes: false };
   }
   IS_MINING = true;
-  const mined = await mine();
+  const mined = await mine(MINER_1);
   IS_MINING = false;
   return { ...mined };
 }

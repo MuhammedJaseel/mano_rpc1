@@ -1,4 +1,3 @@
-import { MINER_1 } from "../modules/static.js";
 import Block from "../schemas/block.js";
 import Txn from "../schemas/txn.js";
 import crypto from "crypto";
@@ -9,7 +8,7 @@ import mongoose from "mongoose";
 const dummyHash =
   "0x0000000000000000000000000000000000000000000000000000000000000000";
 
-export default async function mine() {
+export default async function mine(minerAddress) {
   let responseTransactiCount = 0;
 
   const session = await mongoose.startSession();
@@ -22,7 +21,7 @@ export default async function mine() {
 
     const bn = newBl.bn;
     const ph = newBl.ph;
-    const m = ethers.getAddress(MINER_1);
+    const m = ethers.getAddress(minerAddress);
     const ts = new Date().getTime();
 
     const txns = await Txn.find({ st: "P" }, null, { session });

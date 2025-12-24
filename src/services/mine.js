@@ -26,8 +26,6 @@ export default async function mine(minerAddress) {
 
     const txns = await Txn.find({ st: "P" }, null, { session });
 
-    console.log(txns);
-
     if (txns.length === 0) throw {};
 
     const txnHashes = [];

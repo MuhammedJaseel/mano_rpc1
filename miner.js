@@ -3,7 +3,6 @@ import mine from "./src/services/mine.js";
 import mongoose from "mongoose";
 
 const connectDB = async () => {
-  console.log(MONGO_URI);
   try {
     await mongoose.connect(MONGO_URI);
     console.log("MongoDB Connected (Miner)");
@@ -18,7 +17,7 @@ const mineByTimer = async () => {
   console.log(mined);
   setTimeout(() => {
     mineByTimer();
-  }, 2000);
+  }, 3000);
 };
 
 connectDB();

@@ -28,15 +28,17 @@ app.get("", async (req, res) => {
   ) {
     try {
       const targetUrl = `${LOCAL_SERVER}${req.url}`;
-      const response = await fetch(targetUrl, {
+
+      const axiosConfig = {
         method: req.method,
+        url: targetUrl,
         headers: { ...req.headers, host: new URL(LOCAL_SERVER).host },
-        body: ["GET", "HEAD"].includes(req.method)
-          ? null
-          : JSON.stringify(req.body),
-      });
-      const data = await response.text();
-      return res.status(response.status).send(data);
+        data: ["GET", "HEAD"].includes(req.method) ? undefined : req.body,
+        validateStatus: () => true,
+      };
+      const response = await axios(axiosConfig);
+      console.log("Responded from local");
+      return res.status(response.status).send(response.data);
     } catch (err) {
       // res.status(500).send("Server Error");
     }

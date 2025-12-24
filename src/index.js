@@ -22,6 +22,7 @@ await connectDB();
 await connectLocalServer();
 
 app.get("", async (req, res) => {
+  console.log(req.hostname);
   if (
     IS_LOCAL_SERVER &&
     (req.hostname === "rpc1-be.vercel" || req.hostname === "localhost")

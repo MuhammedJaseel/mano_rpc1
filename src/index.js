@@ -25,16 +25,15 @@ app.get("", async (req, res) => {
   if (IS_LOCAL_SERVER && req.hostname.split("vercel.app").length === 2) {
     try {
       // const targetUrl = `${LOCAL_SERVER}${req.url}`;
-      const targetUrl = `${LOCAL_SERVER}`;
-      const axiosConfig = {
-        method: req.method,
-        url: targetUrl,
-        // headers: { host: new URL(LOCAL_SERVER).host },
-        // data: req.body,
-        // validateStatus: () => true,
-      };
+      // const axiosConfig = {
+      //   method: req.method,
+      //   url: targetUrl,
+      //   // headers: { host: new URL(LOCAL_SERVER).host },
+      //   // data: req.body,
+      //   // validateStatus: () => true,
+      // };
 
-      const response = await axios(axiosConfig);
+      // const response = await axios(axiosConfig);
 
       return res.json({ app: "rpc1", status: "Working", version: "1.0.5_" });
 

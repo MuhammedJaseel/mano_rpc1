@@ -22,10 +22,6 @@ await connectDB();
 await connectLocalServer();
 
 app.get("", async (req, res) => {
-  return res.json({ app: "rpc1", status: "Working", version: "1.0.4" });
-});
-
-app.post("", async (req, res) => {
   if (IS_LOCAL_SERVER && req.hostname.split("vercel.app").length === 2) {
     try {
       const targetUrl = `${LOCAL_SERVER}${req.url}`;
@@ -35,10 +31,10 @@ app.post("", async (req, res) => {
         headers: { ...req.headers, host: new URL(LOCAL_SERVER).host },
         data: req.body,
         validateStatus: () => true,
-      };    
+      };
       console.log(targetUrl);
       console.log(axiosConfig);
-        
+
       const response = await axios(axiosConfig);
       return res.status(response.status).send(response.data);
     } catch (err) {
@@ -46,6 +42,10 @@ app.post("", async (req, res) => {
       return res.status(500).send("Server Error");
     }
   }
+  return res.json({ app: "rpc1", status: "Working", version: "1.0.4" });
+});
+
+app.post("", async (req, res) => {
   return res.json(await bcRouter(req.body));
 });
 

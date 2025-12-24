@@ -24,11 +24,12 @@ await connectLocalServer();
 app.get("", async (req, res) => {
   if (IS_LOCAL_SERVER && req.hostname.split("vercel.app").length === 2) {
     try {
-      const targetUrl = `${LOCAL_SERVER}${req.url}`;
+      // const targetUrl = `${LOCAL_SERVER}${req.url}`;
+      const targetUrl = `${LOCAL_SERVER}`;
       const axiosConfig = {
         method: req.method,
         url: targetUrl,
-        headers: { host: new URL(LOCAL_SERVER).host },
+        // headers: { host: new URL(LOCAL_SERVER).host },
         // data: req.body,
         // validateStatus: () => true,
       };
@@ -39,7 +40,7 @@ app.get("", async (req, res) => {
 
       // return res.status(response.status).send(response.data);
     } catch (err) {
-      connectLocalServer();
+      // connectLocalServer();
       return res.status(500).send("Server Error");
     }
   }

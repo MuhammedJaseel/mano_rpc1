@@ -1,9 +1,10 @@
 import { Transaction, ethers } from "ethers";
-import { GAS_LIMIT, GAS_PRICE } from "../modules/static.js";
-import { mineTransactins } from "./chain.js";
+import { GAS_LIMIT, GAS_PRICE, MINER_1 } from "../modules/static.js";
 import Wallets from "../schemas/wallets.js";
+import Signs from "../schemas/sign.js";
 import Txn from "../schemas/txn.js";
-import mongoose from "mongoose";
+
+import miner from "./miner.js";
 
 async function initAppWallet() {
   // This will automatically create the 'wallets' collection if it doesn't
@@ -11,7 +12,7 @@ async function initAppWallet() {
   if (count !== 0) return;
   const wallet = new Wallets({
     a: ethers.getAddress("0x347D5C8Dc99Bd5F70d429F350FB9578fD78A2f35"),
-    b: "0x52b7d2dcc80cd2e4000000",
+    b: "100000000000000000000000000",
   });
   await wallet.save();
 }
@@ -21,7 +22,7 @@ export const getBalance = async (params) => {
   const a = params?.[0];
   if (!a || typeof a !== "string") return { result: null };
   const wallet = await Wallets.findOne({ a: ethers.getAddress(a) });
-  return { result: wallet?.b || "0x0" };
+  return { result: "0x" + (wallet?.b || "0").toString(16) };
 };
 
 export const getTransactionCount = async (params) => {
@@ -35,70 +36,25 @@ export const getTransactionCount = async (params) => {
 };
 
 export const sendRawTransaction = async (params) => {
-  const sign = params[0];
-  const signedTx = Transaction.from(sign);
-
-  const txValue = BigInt(signedTx.value);
-
-  if (txValue < 0n) return { result: null };
-
-  const txGas = BigInt(GAS_PRICE) * BigInt(GAS_LIMIT);
-
-  const from = await Wallets.findOne({ a: ethers.getAddress(signedTx.from) });
-
-  var fromBalance = BigInt(from?.b || "0x0");
-
-  if (fromBalance < txValue + txGas) {
+  const sn = params[0];
+  const signedTx = Transaction.from(sn);
+  if (BigInt(signedTx.value) < 0n) return { result: null };
+  if (
+    BigInt(signedTx.gasLimit) < BigInt(GAS_LIMIT) ||
+    BigInt(signedTx.gasPrice) < BigInt(GAS_PRICE)
+  ) {
     return {
-      error: { code: -32603, message: "insufficient funds for execution" },
+      success: false,
+      code: -2,
+      error: "INSUFFICIENT_FEE",
+      message: "Transaction rejected due to insufficient transaction fee.",
+      details:
+        "The sender's account balance is too low to cover the required fee for this transaction. Please top up your account.",
     };
   }
-
-  fromBalance -= txValue + txGas;
-  const b = "0x" + fromBalance.toString(16);
-
-  const session = await mongoose.startSession();
-  session.startTransaction();
-
-  try {
-    const updateResult = await Wallets.findOneAndUpdate(
-      { a: ethers.getAddress(from.a), n: signedTx.nonce - 1 },
-      { b, n: from.n + 1 },
-      { session }
-    );
-
-    if (!updateResult) throw {};
-
-    const newTxn = [
-      {
-        th: signedTx.hash,
-        s: sign,
-        f: signedTx.from,
-        t: signedTx.to,
-        v: "0x" + signedTx.value.toString(16),
-        n: signedTx.nonce,
-        gp: GAS_PRICE,
-        gl: GAS_LIMIT,
-        gu: "0x" + txGas.toString(16),
-        bn: null,
-        bh: null,
-      },
-    ];
-
-    await Txn.create(newTxn, { session });
-
-    await session.commitTransaction();
-    session.endSession();
-    try {
-      fetch(process.env.SCAN_API + "/rpcinfo?info=txn_added").catch(() => {});
-    } catch (e) {}
-    mineTransactins();
-    return { result: signedTx.hash };
-  } catch (err) {
-    await session.abortTransaction();
-    session.endSession();
-    return { error: { code: -32000, message: "nonce too low" } };
-  }
+  await Signs.create({ sn });
+  miner(MINER_1);
+  return { result: signedTx.hash };
 };
 
 export const getTransactionByHash = async (params) => {
@@ -117,9 +73,9 @@ export const getTransactionByHash = async (params) => {
       to: txn.t,
       from: txn.f,
       nonce: txn.n,
-      value: txn.v,
-      gasPrice: txn.gp,
-      gas: txn.gu,
+      value: "0x" + txn.v.toString(16),
+      gasPrice: "0x" + txn.gp.toString(16),
+      gas: "0x" + txn.gu.toString(16),
       input: "0x",
       v: "0x" + sig.v.toString(16),
       r: sig.r,
@@ -127,7 +83,7 @@ export const getTransactionByHash = async (params) => {
       blockHash: txn.bh,
       blockNumber: txn.bn,
       transactionIndex: null,
-      type: "0x0",
+      type: txn.st === "S" ? "0x1" : "0x0",
     },
   };
 };
@@ -147,13 +103,13 @@ export const getTransactionReceipt = async (params) => {
       blockNumber: txn.bn,
       from: txn.f,
       to: txn.t,
-      cumulativeGasUsed: txn.gu,
-      gasUsed: txn.gu,
+      cumulativeGasUsed: "0x" + txn.gu.toString(16),
+      gasUsed: "0x" + txn.gu.toString(16),
       contractAddress: null,
       logs: [],
       logsBloom:
         "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
-      status: "0x1",
+      type: txn.st === "S" ? "0x1" : "0x0",
     },
   };
 };

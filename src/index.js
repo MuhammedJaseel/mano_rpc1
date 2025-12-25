@@ -1,9 +1,9 @@
 import express from "express";
 import bcRouter from "./bcRouter.js";
 import cors from "cors";
-import { mineTransactins } from "./services/chain.js";
 import { connectDB } from "./modules/database.js";
-import { PORT } from "./modules/static.js";
+import { MINER_3, PORT } from "./modules/static.js";
+import miner from "./services/miner.js";
 
 const app = express();
 app.use(express.json());
@@ -21,7 +21,7 @@ app.post("", async (req, res) => {
 });
 
 app.get("/mine", async (req, res) => {
-  return res.json(await mineTransactins());
+  return res.json(await miner(MINER_3));
 });
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

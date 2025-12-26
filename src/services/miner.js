@@ -87,7 +87,10 @@ export default async function miner(minerAddress) {
             { b },
             { session }
           );
-        } else await Wallets.create([{ a: ta, b: value }], { session });
+        } else {
+          if (b !== 0n)
+            await Wallets.create([{ a: ta, b: String(value) }], { session });
+        }
 
         txs.push(signedTx.hash);
         totalGas = totalGas + txGas;

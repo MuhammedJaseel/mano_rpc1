@@ -22,7 +22,7 @@ export const getBalance = async (params) => {
   const a = params?.[0];
   if (!a || typeof a !== "string") return { result: null };
   const wallet = await Wallets.findOne({ a: ethers.getAddress(a) });
-  return { result: "0x" + (wallet?.b || "0").toString(16) };
+  return { result: "0x" + BigInt(wallet?.b || "0").toString(16) };
 };
 
 export const getTransactionCount = async (params) => {

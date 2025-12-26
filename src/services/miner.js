@@ -15,7 +15,7 @@ export default async function miner(minerAddress) {
   session.startTransaction();
 
   try {
-    const signs = await Signs.find({ st: "I" }, null).sort({ ts: -1 });
+    const signs = await Signs.find({ st: "I" }, null);
     if (signs.length === 0) throw {};
 
     let newBl = await Block.findOne(null, null).sort({ bn: -1 });

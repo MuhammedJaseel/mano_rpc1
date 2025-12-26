@@ -69,30 +69,30 @@ export const getTransactionByHash = async (params) => {
 
   return {
     result: {
+      blockHash: txn.bh,
+      blockNumber: "0x" + txn.bn.toString(16),
+      from: txn.f,
+      gas: "0x" + txn.gu.toString(16),
       hash: txn.th,
       to: txn.t,
-      from: txn.f,
-      nonce: txn.n,
+      nonce: txn.tn,
       value: "0x" + txn.v.toString(16),
       gasPrice: "0x" + txn.gp.toString(16),
-      gas: "0x" + txn.gu.toString(16),
       input: "0x",
       v: "0x" + sig.v.toString(16),
       r: sig.r,
       s: sig.s,
-      blockHash: txn.bh,
-      blockNumber: txn.bn,
-      transactionIndex: null,
+      transactionIndex: "0x0",
       type: txn.st === "S" ? "0x1" : "0x0",
+      accessList: [],
     },
   };
 };
 
 export const getTransactionReceipt = async (params) => {
   const txHash = params?.[0];
-
   if (!txHash || typeof txHash !== "string") return { result: null };
-  const txn = await Txn.findOne({ th: txHash, st: "C" });
+  const txn = await Txn.findOne({ th: txHash, st: "S" });
   if (!txn) return { result: null };
 
   return {
@@ -100,7 +100,7 @@ export const getTransactionReceipt = async (params) => {
       transactionHash: txn.th,
       transactionIndex: "0x0",
       blockHash: txn.bh,
-      blockNumber: txn.bn,
+      blockNumber: "0x" + txn.bn.toString(16),
       from: txn.f,
       to: txn.t,
       cumulativeGasUsed: "0x" + txn.gu.toString(16),

@@ -14,10 +14,6 @@ export const blockNumber = async () => {
   return { result: "0x" + block.bn.toString(16) };
 };
 
-export function gatBlocks() {
-  return Block.find().sort({ ca: -1 }).limit(100);
-}
-
 export const getBlockByNumber = async (params) => {
   // TODO: Need to add the filter full or
   const em = "invalid argument 0: hex number, expected string";
@@ -40,6 +36,7 @@ export const getBlockByNumber = async (params) => {
 
   return {
     result: {
+      hash: block?.bh || HD64,
       parentHash: block?.ph || HD64,
       sha3Uncles: HD64,
       miner: block?.m || HD40,
@@ -57,7 +54,6 @@ export const getBlockByNumber = async (params) => {
       extraData: "0x",
       mixHash: HD64,
       nonce: block?.n || HD16,
-      hash: block?.h,
       transactions: block?.txs || [],
       uncles: [],
     },

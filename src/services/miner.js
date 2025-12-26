@@ -33,6 +33,7 @@ export default async function miner(minerAddress) {
     var totalGas = BigInt(0);
 
     for (let it of signs) {
+      // console.log(it);
       const sign = it.sn;
       const signedTx = Transaction.from(sign);
       const value = signedTx.value;
@@ -44,6 +45,32 @@ export default async function miner(minerAddress) {
       var fromB = BigInt(from?.b || "-1");
 
       let failed = fromB < value + txGas;
+      let st = failed ? "F" : "S";
+
+      await Signs.findByIdAndUpdate(it._id, { st }, { session });
+
+      try {
+        const newTxn = [
+          {
+            th: signedTx.hash,
+            f: fa,
+            t: ta,
+            v: String(value),
+            tn: signedTx.nonce,
+            gp: signedTx.gasPrice,
+            gl: signedTx.gasLimit,
+            gu: String(txGas),
+            bn: bn,
+            bh: bh,
+            s: sign,
+            st,
+          },
+        ];
+        await Txn.create(newTxn, { session });
+      } catch (err) {
+        if (err.code === 11000) failed = true;
+        else throw err;
+      }
 
       if (!failed) {
         let b = String(fromB - (value + txGas));
@@ -65,26 +92,6 @@ export default async function miner(minerAddress) {
         txs.push(signedTx.hash);
         totalGas = totalGas + txGas;
       }
-
-      let st = failed ? "F" : "S";
-      const newTxn = [
-        {
-          th: signedTx.hash,
-          f: fa,
-          t: ta,
-          v: String(value),
-          tn: signedTx.nonce,
-          gp: signedTx.gasPrice,
-          gl: signedTx.gasLimit,
-          gu: String(txGas),
-          bn: bn,
-          bh: bh,
-          s: sign,
-          st,
-        },
-      ];
-      await Txn.create(newTxn, { session });
-      await Signs.findByIdAndUpdate(it._id, { st }, { session });
     }
 
     const gu = String(totalGas);
@@ -97,6 +104,7 @@ export default async function miner(minerAddress) {
       let b = String(BigInt(miner.b) + totalGas);
       await Wallets.findOneAndUpdate({ a: m }, { b }, { session });
     }
+
     await session.commitTransaction();
     session.endSession();
     result = { bn, bh, txs };

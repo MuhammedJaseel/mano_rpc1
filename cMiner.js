@@ -14,10 +14,10 @@ const connectDB = async () => {
 
 const mineByTimer = async () => {
   const mined = await miner(MINER_2);
-  console.log(mined);
+  if (mined) console.log(mined);
   setTimeout(() => {
     mineByTimer();
-  }, 3000);
+  }, 1000);
 };
 
 await connectDB();

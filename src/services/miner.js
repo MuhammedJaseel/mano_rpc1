@@ -113,7 +113,7 @@ export default async function miner(minerAddress) {
     session.endSession();
     result = { bn, bh, txs };
   } catch (err) {
-    console.log(err);
+    // console.log(err);
     await session.abortTransaction();
     session.endSession();
   }
